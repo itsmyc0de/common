@@ -1,0 +1,72 @@
+package sudheesh.a16mb.com.encdec;
+
+import android.util.Base64;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+/**
+ * Created by KUTTAN on 16-12-2016.
+ */
+
+public class myenc {
+
+
+
+
+
+    public String encrypt(String value,String key)
+    throws UnsupportedEncodingException,InvalidKeyException,NoSuchAlgorithmException,NoSuchPaddingException,InvalidAlgorithmParameterException,IllegalBlockSizeException,BadPaddingException
+    {
+
+        byte[] value_bytes=value.getBytes("UTF-8");
+        byte[] key_bytes=getKeyBytes(key);
+        return Base64.encodeToString(encrypt(value_bytes,key_bytes,key_bytes),0);
+
+    }
+
+    private byte[] getKeyBytes(String paramstring) throws UnsupportedEncodingException {
+
+        byte[] arraybyte1=new byte[16];
+        byte[] arraybyte2=paramstring.getBytes("UTF-8");
+        System.arraycopy(arraybyte2,0,arraybyte1,0,Math.min(arraybyte2.length,arraybyte1.length));
+        return arraybyte1;
+    }
+
+    public byte[] encrypt(byte[] paramarayof1,byte[] paramarrayof2,byte[] paramarrayof3)
+    throws NoSuchAlgorithmException,NoSuchPaddingException,InvalidKeyException,InvalidAlgorithmParameterException,IllegalBlockSizeException,BadPaddingException
+    {
+        Cipher localciper=Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        localciper.init(1,new SecretKeySpec(paramarrayof2,"AES"),new IvParameterSpec(paramarrayof3));
+        return  localciper.doFinal(paramarayof1);
+    }
+
+    public String decrypt(String value,String key)
+    throws GeneralSecurityException,IOException
+    {
+        byte[] value_bytes=Base64.decode(value,0);
+        byte[] key_bytes=getKeyBytes(key);
+        return  new String(decrypt(value_bytes,key_bytes,key_bytes),"UTF-8");
+    }
+
+    public byte[] decrypt(byte[] arraaybyte1,byte[] arraybyte2,byte[] arraybyte3)
+    throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
+    {
+        Cipher localcipher=Cipher.getInstance("AES/CBC/PKCS5Padding");
+        localcipher.init(2,new SecretKeySpec(arraybyte2,"AES"),new IvParameterSpec(arraybyte3));
+        return localcipher.doFinal(arraaybyte1);
+    }
+}
